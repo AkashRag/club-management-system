@@ -1,0 +1,1049 @@
+{
+  "name": "Club Management System",
+  "nodes": [
+    {
+      "parameters": {
+        "from": "+14155238886",
+        "to": "=+91{{ $('Registration').item.json.body.phone }}",
+        "toWhatsapp": true,
+        "message": "=Hi  {{ $json.name }}, you got registered with us. can avail benefits by using different facilities.\nYour Secret Id for login is- {{ $json.token }}\n\n\nPlease login at: [https://hanji123.app.n8n.cloud/webhook-test/verify]\nYour registered email: {{ $('User_Registration').item.json.email }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        -1616
+      ],
+      "id": "05fc6c84-a147-49c0-b124-ba97e4ea6bcf",
+      "name": "Send an SMS/MMS/WhatsApp message",
+      "credentials": {
+        "twilioApi": {
+          "id": "Qi4IDwVrbzgmTRPB",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "useJson": true,
+        "claimsJson": "={\n  \"member_id\": {{$json.id}},\n  \"email\": \"{{$json.email}}\"\n}",
+        "options": {
+          "kid": "mygym_secret_123",
+          "algorithm": "HS256"
+        }
+      },
+      "type": "n8n-nodes-base.jwt",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        -1616
+      ],
+      "id": "260a32d3-d99b-4041-9bb2-72c67c8402f4",
+      "name": "JWT",
+      "credentials": {
+        "jwtAuth": {
+          "id": "lUzYk8RnUT1t1vmA",
+          "name": "JWT Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "verify",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2528,
+        -1344
+      ],
+      "id": "347cb043-5a60-4ba6-8b10-c9ed30cb074b",
+      "name": "Webhook1",
+      "webhookId": "e200abcd-3749-48ed-98aa-42ee75830c57"
+    },
+    {
+      "parameters": {
+        "operation": "verify",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Im15Z3ltX3NlY3JldF8xMjMifQ.eyJtZW1iZXJfaWQiOjMyLCJlbWFpbCI6ImFrYXNodGVzdEBnbWFpbC5jb20iLCJpYXQiOjE3ODA1MDEyNTd9.x3Z8VSmSxP-V8hw9yylXilsGTm72SrboF1OxjpeEW2E",
+        "options": {
+          "complete": true
+        }
+      },
+      "type": "n8n-nodes-base.jwt",
+      "typeVersion": 1,
+      "position": [
+        -2240,
+        -1344
+      ],
+      "id": "2375a6b7-0ca9-416a-af43-924126aafb06",
+      "name": "JWT1",
+      "credentials": {
+        "jwtAuth": {
+          "id": "lUzYk8RnUT1t1vmA",
+          "name": "JWT Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "members",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "condition": "eq",
+              "keyValue": "={{ $json.payload.email }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1936,
+        -1344
+      ],
+      "id": "d86af081-1789-4cb1-8e4a-e866860e5112",
+      "name": "Get many rows",
+      "credentials": {
+        "supabaseApi": {
+          "id": "qNRF2DlPc1crt0lj",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cbf98f8c-1ef2-4a5b-94fc-40e2cd471a9a",
+              "leftValue": "={{ $('Webhook1').item.json.body.status }}",
+              "rightValue": "=pending",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1520,
+        -1344
+      ],
+      "id": "4ba381a8-341a-4f2e-a72a-9289095b3b0c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "registration",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2528,
+        -1584
+      ],
+      "id": "4b0bca33-d32d-4e02-84c1-34b501f8cfcd",
+      "name": "Registration",
+      "webhookId": "452e9a40-8a90-4f52-a5d0-14059a85a725"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "members",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "condition": "eq",
+              "keyValue": "={{ $json.body.email }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2240,
+        -1584
+      ],
+      "id": "ba2be3ab-d43b-4c1e-8861-18187fc1a3b3",
+      "name": "Get many rows1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "qNRF2DlPc1crt0lj",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f44eb95c-bf7b-4fb5-a68b-b35918b6717b",
+              "leftValue": "={{ $input.first().json.id }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1952,
+        -1584
+      ],
+      "id": "3faa9cca-2430-4ba2-9b63-c410f0c165fe",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "from": "+14155238886",
+        "to": "+919211847511",
+        "toWhatsapp": true,
+        "message": "=\"HI {{ $('Registration').item.json.body.name }} \"You already have an account\" ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        -1696,
+        -1488
+      ],
+      "id": "164bfcf0-d68a-4638-a76f-4177ed80867a",
+      "name": "Send an SMS/MMS/WhatsApp message1",
+      "credentials": {
+        "twilioApi": {
+          "id": "Qi4IDwVrbzgmTRPB",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\nconst password = $('Registration').first().json.body.password\nconst hash = crypto.createHash('sha256').update(password).digest('hex');\nreturn [{ json: { ...$input.first().json.body, password_hash: hash } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1696,
+        -1696
+      ],
+      "id": "77fe2153-5a7e-4004-94e1-79b6fa9b87d7",
+      "name": "Password_Hashing"
+    },
+    {
+      "parameters": {
+        "tableId": "members",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('Registration').item.json.body.name }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $('Registration').item.json.body.email }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $('Registration').item.json.body.phone }}"
+            },
+            {
+              "fieldId": "plan",
+              "fieldValue": "={{ $('Registration').item.json.body.plan }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "=pending"
+            },
+            {
+              "fieldId": "password_hash",
+              "fieldValue": "={{ $json.password_hash }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1184,
+        -1616
+      ],
+      "id": "e89b65d1-09bb-4288-922f-fd474a58059e",
+      "name": "User_Registration",
+      "credentials": {
+        "supabaseApi": {
+          "id": "qNRF2DlPc1crt0lj",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Club Management system",
+        "options": {
+          "systemMessage": "=You are a professional Club Membership Assistant.\n\nYour job is to create a clean, friendly, and professional member summary.\n\nRules:\n- Never show password, password_hash, token, JWT, secret_key, or internal IDs.\n- Use simple formatting, not markdown tables.\n- Use emojis for readability.\n- If a value is null, show \"Not Available\".\n- Format the response like a membership card.\n\n\n👤 Member Details\n• Name: {name}: {{ $('Get many rows').item.json.name }}\n• Email: {email}:{{ $('Get many rows').item.json.email }}\n• Phone: {phone}:{{ $('Get many rows').item.json.phone }}\n\n📋 Membership Plan\n• Plan: {plan}:{{ $('Get many rows').item.json.plan }}\n• Join Date: {join_date}:{{ $('Get many rows').item.json.join_date }}\n• Expiry Date: {expiry_date}:{{ $('Get many rows').item.json.expiry_date }}\n\n✅ Your membership is active and valid.\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1168,
+        -1472
+      ],
+      "id": "536a7739-b70d-48d1-bc67-a60768be5416",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "from": "+14155238886",
+        "to": "+919211847511",
+        "toWhatsapp": true,
+        "message": "={{ $('AI Agent').item.json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        -1472
+      ],
+      "id": "6e003ad3-db3f-4883-8d1c-e4a0465c2ac0",
+      "name": "Send an SMS/MMS/WhatsApp message2",
+      "credentials": {
+        "twilioApi": {
+          "id": "Qi4IDwVrbzgmTRPB",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "+14155238886",
+        "to": "+919211847511",
+        "toWhatsapp": true,
+        "message": "=Hi {{ $('Webhook1').item.json.body.name }}. Hope you are doing well. You can avail our services by taking the best plan. \nOur Plans:-\n{{ $json.id }}\n{{ $json.plan_name }}\n{{ $json.duration_days }}\n{{ $json.features }}\n{{ $json.price }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        -1328
+      ],
+      "id": "a0b5030f-5a29-4586-905f-2ce0381ab767",
+      "name": "Send an SMS/MMS/WhatsApp message3",
+      "credentials": {
+        "twilioApi": {
+          "id": "Qi4IDwVrbzgmTRPB",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "plan"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        -1328
+      ],
+      "id": "1cbbfb2e-b62e-45c5-a606-fce91cbc9307",
+      "name": "Get a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "qNRF2DlPc1crt0lj",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -1168,
+        -1280
+      ],
+      "id": "390d3c57-e49a-4543-9620-8db74909c040",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "I41b5hgGyncUz4ak",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "verify",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Im15Z3ltX3NlY3JldF8xMjMifQ.eyJtZW1iZXJfaWQiOjMyLCJlbWFpbCI6ImFrYXNodGVzdEBnbWFpbC5jb20iLCJpYXQiOjE3ODA1MDEyNTd9.x3Z8VSmSxP-V8hw9yylXilsGTm72SrboF1OxjpeEW2E",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.jwt",
+      "typeVersion": 1,
+      "position": [
+        -2240,
+        -1136
+      ],
+      "id": "5f779d8a-69da-4b0f-83a8-26a3e2c6365d",
+      "name": "JWT2",
+      "credentials": {
+        "jwtAuth": {
+          "id": "lUzYk8RnUT1t1vmA",
+          "name": "JWT Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "PATCH",
+        "path": "data_update",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2528,
+        -1136
+      ],
+      "id": "cac58dea-074f-4d3a-b111-6e847561fbb8",
+      "name": "Razor_pay",
+      "webhookId": "da654688-922d-4323-af97-1560c56551ba"
+    },
+    {
+      "parameters": {
+        "from": "+14155238886",
+        "to": "+919211847511",
+        "toWhatsapp": true,
+        "message": "\"Your payment is received. Now you can avail your services.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        -1136
+      ],
+      "id": "cf6a4464-39d6-47d4-8c63-c34cc8f99457",
+      "name": "Send an SMS/MMS/WhatsApp message4",
+      "credentials": {
+        "twilioApi": {
+          "id": "Qi4IDwVrbzgmTRPB",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -2528,
+        -960
+      ],
+      "id": "4b56ea73-7b02-4787-a9fd-9ae7902041e1",
+      "name": "Reminder"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f71dad98-0b9e-42ef-aed3-85dcd8baf93b",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "Active",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "7214d4b8-a5a6-4c19-8175-778602622ad0",
+              "leftValue": "={{ $json.expiry_date }}",
+              "rightValue": "={{ $now.plus(3, 'days').toISODate() }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "beforeOrEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": "={{ true }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1936,
+        -960
+      ],
+      "id": "44df517e-2fd0-4e26-8eb9-ff8e46fc6ada",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "members",
+        "matchType": "allFilters"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2240,
+        -960
+      ],
+      "id": "61089922-adb6-4cb9-8de4-2c7db58b6dff",
+      "name": "Get many rows2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "qNRF2DlPc1crt0lj",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "+14155238886",
+        "to": "+919211847511",
+        "toWhatsapp": true,
+        "message": "=Hi , {{ $('Get many rows2').item.json.name }} This is a friendly reminder that your membership plan will expire on {{ $('Get many rows2').item.json.expiry_date }}.  To continue enjoying uninterrupted benefits and services, please renew your subscription before the due date.  Thank you!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        -1296,
+        -976
+      ],
+      "id": "5cb68eb4-99df-4357-b893-4527f9d57d02",
+      "name": "Send an SMS/MMS/WhatsApp message5",
+      "credentials": {
+        "twilioApi": {
+          "id": "Qi4IDwVrbzgmTRPB",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "members",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "condition": "eq",
+              "keyValue": "={{ $('Webhook1').item.json.body.email }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "\"Active\""
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        -1472
+      ],
+      "id": "b157bd0e-84ab-43cf-af61-dadc5d473f8a",
+      "name": "Update a row1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "qNRF2DlPc1crt0lj",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "members",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $json.payload.member_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1952,
+        -1136
+      ],
+      "id": "52e31138-bb19-4d35-bfee-9ad823047138",
+      "name": "Read_Member_table",
+      "credentials": {
+        "supabaseApi": {
+          "id": "qNRF2DlPc1crt0lj",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "plan",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "plan_name",
+              "condition": "eq",
+              "keyValue": "={{ $('Razor_pay').item.json.body.plan }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1632,
+        -1136
+      ],
+      "id": "b57950a4-4c9b-4f61-8844-1b20686875c1",
+      "name": "Read_plan_node",
+      "credentials": {
+        "supabaseApi": {
+          "id": "qNRF2DlPc1crt0lj",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "payments",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "member_id",
+              "fieldValue": "={{ $('JWT2').item.json.payload.member_id }}"
+            },
+            {
+              "fieldId": "amount",
+              "fieldValue": "={{ $json.price }}"
+            },
+            {
+              "fieldId": "payment_date",
+              "fieldValue": "={{ $now.toISODate() }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "\"Paid\""
+            },
+            {
+              "fieldId": "next_due_date",
+              "fieldValue": "={{ $now.plus({ days: $json.duration_days }).toISODate() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1296,
+        -1136
+      ],
+      "id": "a4b75373-6c27-4934-8624-4a45ee73076a",
+      "name": "Payments_Rows",
+      "credentials": {
+        "supabaseApi": {
+          "id": "qNRF2DlPc1crt0lj",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "members",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.member_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "=Active"
+            },
+            {
+              "fieldId": "join_date",
+              "fieldValue": "={{ $json.payment_date }}"
+            },
+            {
+              "fieldId": "expiry_date",
+              "fieldValue": "={{ $json.next_due_date }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -992,
+        -1136
+      ],
+      "id": "bb2d5276-b9a3-42f1-b7ee-1c5948547874",
+      "name": "Update_Memeber",
+      "credentials": {
+        "supabaseApi": {
+          "id": "qNRF2DlPc1crt0lj",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "JWT": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "JWT1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JWT1": {
+      "main": [
+        [
+          {
+            "node": "Get many rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registration": {
+      "main": [
+        [
+          {
+            "node": "Get many rows1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Password_Hashing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Password_Hashing": {
+      "main": [
+        [
+          {
+            "node": "User_Registration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User_Registration": {
+      "main": [
+        [
+          {
+            "node": "JWT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Update a row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JWT2": {
+      "main": [
+        [
+          {
+            "node": "Read_Member_table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Razor_pay": {
+      "main": [
+        [
+          {
+            "node": "JWT2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reminder": {
+      "main": [
+        [
+          {
+            "node": "Get many rows2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows2": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row1": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read_Member_table": {
+      "main": [
+        [
+          {
+            "node": "Read_plan_node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read_plan_node": {
+      "main": [
+        [
+          {
+            "node": "Payments_Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payments_Rows": {
+      "main": [
+        [
+          {
+            "node": "Update_Memeber",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update_Memeber": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "87416116-23d4-4b65-8e13-0382764352a8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1361b044b93e7f13b8f109f6406de1257784ff3cd16c793d6c3622e10ca87316"
+  },
+  "id": "kb5UDWvdtlR7Pdt9",
+  "tags": []
+}
