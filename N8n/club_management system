@@ -1,0 +1,65 @@
+Just built a fully automated Club Management System using n8n! 🚀
+
+
+
+4 workflows. 3 database tables. Zero manual work after setup.
+
+
+
+What it does:
+
+🔐 Member Registration — email duplicate check, bcrypt password hashing, JWT token generation, WhatsApp welcome message
+
+📊 Member Dashboard — JWT verification + Groq AI generates a personalized membership summary
+
+💳 Payment Processing — Razorpay webhook → 3 Supabase tables update automatically
+
+⏰ Daily Reminder Bot — Scheduler checks expiry dates every day, sends WhatsApp reminder 3 days before expiry
+
+
+
+Key concepts I learned building this:
+
+• JWT authentication flow (Sign → Verify)
+
+• Password hashing with bcrypt
+
+• Multi-table database relations
+
+• Webhook-driven architecture
+
+• AI integration inside automation workflows
+
+
+
+Tech Stack:
+
+→ n8n (workflow automation)
+
+→ Supabase (PostgreSQL database)
+
+→ JWT (authentication)
+
+→ Twilio (WhatsApp messaging)
+
+→ Groq AI (fast AI responses)
+
+→ Razorpay (payment gateway)
+
+
+
+Biggest learning: Real-world systems are not just about code — it's about how data flows, how security works, and how everything connects together.
+
+
+
+This is Project 5 in my journey to become a 50K+ AI Automation Engineer.
+
+
+
+Building in public from Delhi, India 🇮🇳
+
+GitHub: github.com/AkashRag
+
+
+
+#n8n #AIAutomation #Supabase #JWT #BuildInPublic #100DaysOfCode #IndianDeveloper #AutomationEngineer #Groq #Twilio #WebhookArchitecture
